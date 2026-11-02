@@ -1,0 +1,73 @@
+{
+  "name": "salary-ticker",
+  "productName": "工资秒表",
+  "version": "1.0.0",
+  "description": "把月薪拆到秒，实时看着工资增长",
+  "main": "main.js",
+  "author": "salary-ticker",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "test": "node test-core.js && node test-breaks.js && node test-dom.js && node test-settings.js && node test-timeline.js && node test-nightshift.js && node test-natural.js && node test-structure.js",
+    "icon": "node make-icon.js && node make-tauri-icons.js",
+    "build:win": "node build-tauri.js win",
+    "build:mac": "node build-tauri.js mac",
+    "build:win:electron": "node build-win.js",
+    "build:mac:electron": "node build-mac.js arm64 && node build-mac.js x64"
+  },
+  "build": {
+    "appId": "com.salaryticker.app",
+    "productName": "SalaryTicker",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "index.html",
+      "build/icon.png",
+      "!test-*.js",
+      "!make-*.js",
+      "!build-*.js",
+      "!prepare-mac.js",
+      "!src/**",
+      "!src-tauri/**",
+      "!**/*.md",
+      "!dist/**",
+      "!.eb-cache/**",
+      "!.electron-cache/**",
+      "!.cargo-target/**",
+      "!.tmp/**"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "build/icon.png",
+      "signAndEditExecutable": false,
+      "sign": null,
+      "artifactName": "SalaryTicker-${version}-win-x64-electron.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": ["x64", "arm64"]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "public.app-category.finance",
+      "identity": null,
+      "artifactName": "SalaryTicker-${version}-mac-${arch}-electron.${ext}"
+    }
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0",
+    "electron": "^32.2.0",
+    "electron-builder": "^25.1.8"
+  }
+}

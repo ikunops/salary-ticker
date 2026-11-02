@@ -1,0 +1,21 @@
+[package]
+name = "salary-ticker"
+version = "1.0.0"
+description = "把月薪拆到秒，实时看着工资增长"
+authors = ["salary-ticker"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.77"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

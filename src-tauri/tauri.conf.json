@@ -1,0 +1,51 @@
+﻿{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SalaryTicker",
+  "version": "1.0.0",
+  "identifier": "com.salaryticker.desktop",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "工资秒表",
+        "width": 1200,
+        "height": 820,
+        "minWidth": 380,
+        "minHeight": 520,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true,
+        "theme": "Dark",
+        "backgroundColor": "#070a10"
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "salary-ticker",
+    "shortDescription": "把月薪拆到秒，实时看着工资增长",
+    "longDescription": "工资秒表：把月薪按工作时长或自然天数拆到秒级，实时看着当前已赚金额增长。支持法定节假日、午休扣除、跨午夜夜班和三种计薪口径。",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.icns"
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      },
+      "nsis": {
+        "languages": ["SimpChinese", "English"],
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

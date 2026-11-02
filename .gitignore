@@ -1,0 +1,32 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+.cargo-target/
+src-tauri/target/
+*.exe
+*.msi
+*.dmg
+src-tauri/gen/
+
+# 缓存
+.eb-cache/
+.electron-cache/
+.tmp/
+.cargo/
+*.log
+
+# 生成的中间文件
+src/index.html
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# ��ʱ��֤�ļ�
+_electron_check.js
+_extracted_index.html
