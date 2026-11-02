@@ -1,4 +1,4 @@
-﻿// 验证三个视图下进度条的结构与填充逻辑
+// 验证三个视图下进度条的结构与填充逻辑
 const fs = require('fs');
 const path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
@@ -41,7 +41,8 @@ function boot(fixedTime, seedSettings){
   const decBtns=[0,2,3,4].map(d=>{const b=mkEl('button');b.dataset.dec=String(d);return b;});
   const tabBtns=['today','month','year'].map(t=>{const b=mkEl('button');b.dataset.tab=t;return b;});
   const mchips=['today','month','year'].map(t=>{const b=mkEl('button');b.dataset.tab=t;return b;});
-  const qmap={'#weekRow button':weekBtns,'#decChips button':decBtns,'#tabs button':tabBtns,'.mchip':mchips};
+  const themeBtns=['dark','light','red'].map(t=>{const b=mkEl('button');b.dataset.theme=t;return b;});
+  const qmap={'#weekRow button':weekBtns,'#decChips button':decBtns,'#tabs button':tabBtns,'.mchip':mchips,'#themeChips button':themeBtns};
   const store={};
   if(seedSettings) store['salary-ticker-v2']=JSON.stringify(seedSettings);
   const document={

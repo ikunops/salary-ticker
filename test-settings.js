@@ -1,4 +1,4 @@
-﻿// 验证：旧版 v1 设置迁移、换算标签渲染、休息时段增删
+// 验证：旧版 v1 设置迁移、换算标签渲染、休息时段增删
 const fs = require('fs');
 const path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
@@ -47,7 +47,8 @@ function makeEnv(seed){
   const decBtns  = [0,2,3,4].map(d => { const b = mkEl('button'); b.dataset.dec = String(d); return b; });
   const tabBtns  = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
   const mchips   = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
-  const qmap = { '#weekRow button': weekBtns, '#decChips button': decBtns,
+  const themeBtns = ['dark','light','red'].map(t => { const b = mkEl('button'); b.dataset.theme = t; return b; });
+  const qmap = { '#weekRow button': weekBtns, '#decChips button': decBtns, '#themeChips button': themeBtns,
                  '#tabs button': tabBtns, '.mchip': mchips };
   const store = {};
   if (seed) Object.assign(store, seed);

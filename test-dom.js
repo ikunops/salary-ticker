@@ -1,4 +1,4 @@
-﻿// 用最小 DOM 桩在 Node 里真实执行页面脚本，验证元素绑定 + 渲染结果
+// 用最小 DOM 桩在 Node 里真实执行页面脚本，验证元素绑定 + 渲染结果
 const fs = require('fs');
 const path = require('path');
 const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
@@ -56,9 +56,11 @@ const decBtns  = [0,2,3,4].map(d => { const b = mkEl('button'); b.dataset.dec = 
 const tabBtns  = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
 const mchips   = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
 
+const themeBtns = ['dark','light','red'].map(t => { const b = mkEl('button'); b.dataset.theme = t; return b; });
 const qmap = {
   '#weekRow button': weekBtns,
   '#decChips button': decBtns,
+  '#themeChips button': themeBtns,
   '#tabs button': tabBtns,
   '.mchip': mchips,
 };
