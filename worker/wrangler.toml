@@ -1,0 +1,18 @@
+name = "salary-ticker-leaderboard"
+main = "index.js"
+compatibility_date = "2026-01-01"
+
+# 静态页面与 API 同域部署：把仓库根目录的 index.html 一起托管
+[assets]
+directory = "../public"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "salary-ticker-db"
+# 部署后把 wrangler d1 create 输出的 database_id 填到这里
+database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+
+[observability]
+enabled = true

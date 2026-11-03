@@ -57,10 +57,14 @@ const tabBtns  = ['today','month','year'].map(t => { const b = mkEl('button'); b
 const mchips   = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
 
 const paletteBtns = ['green','red'].map(t => { const b = mkEl('button'); b.dataset.palette = t; return b; });
+const rankTabs = ['per_hour','work_hours','earned'].map(t => { const b = mkEl('button'); b.dataset.board = t; return b; });
+const rankScopes = ['global','country'].map(t => { const b = mkEl('button'); b.dataset.scope = t; return b; });
 const qmap = {
   '#weekRow button': weekBtns,
   '#decChips button': decBtns,
   '#paletteChips button': paletteBtns,
+  '.rank-tab': rankTabs,
+  '.rank-scopebtn': rankScopes,
   '#tabs button': tabBtns,
   '.mchip': mchips,
 };

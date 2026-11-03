@@ -30,3 +30,17 @@ Thumbs.db
 # 临时验证文件
 _electron_check.js
 _extracted_index.html
+
+# Worker 本地缓存
+worker/.wrangler/
+worker/node_modules/
+
+# 构建产物副本
+public/index.html
+
+# 临时文件
+_*.html
+_ud*/
+*.png
+!build/*.png
+!src-tauri/icons/*.png

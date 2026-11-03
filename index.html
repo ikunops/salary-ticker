@@ -394,6 +394,43 @@ html[data-mode="light"] .time-btn{color:#5b6b82}
 .input::-webkit-inner-spin-button{opacity:.55}
 html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
 
+/* ===================== 排行榜面板 ===================== */
+.rank-drawer{width:min(420px,100vw)}
+.rank-boards{display:flex;gap:6px;margin:4px 0 12px}
+.rank-tab{
+  flex:1;padding:9px 0;border-radius:10px;border:1px solid var(--line);
+  background:transparent;color:var(--muted);font:inherit;font-size:13px;font-weight:600;
+  cursor:pointer;transition:.16s;
+}
+.rank-tab.on{background:rgba(var(--accent-rgb),.14);border-color:rgba(var(--accent-rgb),.5);color:var(--accent)}
+.rank-scope{display:flex;gap:6px;margin-bottom:12px}
+.rank-scopebtn{
+  flex:1;padding:7px 0;border-radius:999px;border:1px solid var(--line);
+  background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:.16s;
+}
+.rank-scopebtn.on{background:rgba(var(--accent2-rgb),.14);border-color:rgba(var(--accent2-rgb),.5);color:var(--accent2)}
+.rank-list{display:flex;flex-direction:column;gap:6px}
+.rank-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
+  background:var(--input-bg);border:1px solid var(--input-line);
+}
+.rank-row.me{border-color:rgba(var(--accent-rgb),.55);background:rgba(var(--accent-rgb),.10)}
+.rank-no{
+  width:26px;flex:0 0 26px;text-align:center;font-weight:800;font-size:14px;
+  font-variant-numeric:tabular-nums;color:var(--muted);
+}
+.rank-no.top1{color:#f5c542}
+.rank-no.top2{color:#c0c8d4}
+.rank-no.top3{color:#cf8b52}
+.rank-info{flex:1;min-width:0}
+.rank-name{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-meta{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-val{text-align:right;flex:0 0 auto;font-variant-numeric:tabular-nums}
+.rank-val b{display:block;font-size:14px;font-weight:700;color:var(--accent)}
+.rank-val small{font-size:10.5px;color:var(--muted)}
+.rank-empty{padding:40px 0;text-align:center;color:var(--muted);font-size:13px;line-height:1.9}
+.rank-foot{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);text-align:center;line-height:1.8}
+
 /* ===================== 移动端适配 ===================== */
 @media (max-width:760px){
   .wrap{padding:12px clamp(10px,3vw,16px) calc(20px + env(safe-area-inset-bottom))}
@@ -483,6 +520,7 @@ html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
       <button class="icon-btn mode-toggle" id="btnMode" title="切换暗夜 / 浅色">
         <span class="mode-ico" id="modeIcon">🌙</span><span class="mode-txt" id="modeText">暗夜</span>
       </button>
+      <button class="icon-btn" id="btnRank" title="排行榜">🏆</button>
       <button class="icon-btn" id="btnSettings" title="设置（快捷键 S）">⚙</button>
     </div>
   </header>
@@ -618,6 +656,19 @@ html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
     </div>
 
     <div class="field">
+      <label>排行榜</label>
+      <div class="switch"><span>参与排行榜</span><div class="tgl" id="tglRank"></div></div>
+      <div class="row" style="margin-top:10px">
+        <input class="input" id="inNickname" type="text" maxlength="16" placeholder="昵称（默认：匿名用户）">
+      </div>
+      <div class="hint-muted" id="rankHint">开启后会把时薪、工时、地区上报到云端参与排名，不收集任何账号信息</div>
+      <div class="row" style="margin-top:10px">
+        <input class="input" id="inRankApi" type="text" placeholder="接口地址，如 https://xxx.workers.dev">
+      </div>
+      <button class="btn" id="btnRankPost" style="margin-top:10px">立即上报一次</button>
+    </div>
+
+    <div class="field">
       <label>换算物品（点击勾选，价格可改）</label>
       <div class="conv-list" id="convList"></div>
       <div class="row" style="margin-top:10px">
@@ -642,6 +693,30 @@ html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
     </div>
   </div>
 </aside>
+
+<!-- 排行榜面板 -->
+<aside class="drawer rank-drawer" id="rankDrawer">
+  <div class="drawer-head">
+    <h2>🏆 排行榜</h2>
+    <button class="icon-btn" id="btnRankClose" title="关闭">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="rank-boards" id="rankBoards">
+      <button class="rank-tab on" data-board="per_hour">时薪</button>
+      <button class="rank-tab" data-board="work_hours">工时</button>
+      <button class="rank-tab" data-board="earned">已赚</button>
+    </div>
+    <div class="rank-scope" id="rankScope">
+      <button class="rank-scopebtn on" data-scope="global">全球</button>
+      <button class="rank-scopebtn" data-scope="country" id="btnScopeCountry">本地区</button>
+    </div>
+    <div class="rank-list" id="rankList">
+      <div class="rank-empty">正在加载…</div>
+    </div>
+    <div class="rank-foot" id="rankFoot"></div>
+  </div>
+</aside>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1034,6 +1109,162 @@ var CONV_PRESETS=[
   {id:'rent',    name:'房租',    unit:'月', price:3000, emoji:'🏠'},
   {id:'phone',   name:'手机',    unit:'台', price:5999, emoji:'📱'}
 ];
+
+/* ==================== 设备指纹（排行榜用） ==================== */
+/* 纯 JS 实现的 MD5，避免引入外部依赖 */
+function md5(str){
+  function add32(a,b){ return (a+b)&0xFFFFFFFF; }
+  function cmn(q,a,b,x,s,t){ a=add32(add32(a,q),add32(x,t)); return add32((a<<s)|(a>>>(32-s)),b); }
+  function ff(a,b,c,d,x,s,t){ return cmn((b&c)|((~b)&d),a,b,x,s,t); }
+  function gg(a,b,c,d,x,s,t){ return cmn((b&d)|(c&(~d)),a,b,x,s,t); }
+  function hh(a,b,c,d,x,s,t){ return cmn(b^c^d,a,b,x,s,t); }
+  function ii(a,b,c,d,x,s,t){ return cmn(c^(b|(~d)),a,b,x,s,t); }
+  function toWords(s){
+    var n=s.length, words=[];
+    for(var i=0;i<n*8;i+=8){ words[i>>5]=(words[i>>5]||0)|((s.charCodeAt(i/8)&0xFF)<<(i%32)); }
+    return words;
+  }
+  // UTF-8 编码
+  var s=unescape(encodeURIComponent(str));
+  var n=s.length;
+  var words=toWords(s);
+  words[n>>2]=(words[n>>2]||0)|(0x80<<((n%4)*8));
+  var len=n*8;
+  words[(n+8>>6<<4)+14]=len&0xFFFFFFFF;
+  words[(n+8>>6<<4)+15]=Math.floor(len/0x100000000);
+
+  var a=1732584193,b=-271733879,c=-1732584194,d=271733878;
+  for(var i=0;i<words.length;i+=16){
+    var olda=a,oldb=b,oldc=c,oldd=d;
+    a=ff(a,b,c,d,words[i+0]||0,7,-680876936);
+    d=ff(d,a,b,c,words[i+1]||0,12,-389564586);
+    c=ff(c,d,a,b,words[i+2]||0,17,606105819);
+    b=ff(b,c,d,a,words[i+3]||0,22,-1044525330);
+    a=ff(a,b,c,d,words[i+4]||0,7,-176418897);
+    d=ff(d,a,b,c,words[i+5]||0,12,1200080426);
+    c=ff(c,d,a,b,words[i+6]||0,17,-1473231341);
+    b=ff(b,c,d,a,words[i+7]||0,22,-45705983);
+    a=ff(a,b,c,d,words[i+8]||0,7,1770035416);
+    d=ff(d,a,b,c,words[i+9]||0,12,-1958414417);
+    c=ff(c,d,a,b,words[i+10]||0,17,-42063);
+    b=ff(b,c,d,a,words[i+11]||0,22,-1990404162);
+    a=ff(a,b,c,d,words[i+12]||0,7,1804603682);
+    d=ff(d,a,b,c,words[i+13]||0,12,-40341101);
+    c=ff(c,d,a,b,words[i+14]||0,17,-1502002290);
+    b=ff(b,c,d,a,words[i+15]||0,22,1236535329);
+    a=gg(a,b,c,d,words[i+1]||0,5,-165796510);
+    d=gg(d,a,b,c,words[i+6]||0,9,-1069501632);
+    c=gg(c,d,a,b,words[i+11]||0,14,643717713);
+    b=gg(b,c,d,a,words[i+0]||0,20,-373897302);
+    a=gg(a,b,c,d,words[i+5]||0,5,-701558691);
+    d=gg(d,a,b,c,words[i+10]||0,9,38016083);
+    c=gg(c,d,a,b,words[i+15]||0,14,-660478335);
+    b=gg(b,c,d,a,words[i+4]||0,20,-405537848);
+    a=gg(a,b,c,d,words[i+9]||0,5,568446438);
+    d=gg(d,a,b,c,words[i+14]||0,9,-1019803690);
+    c=gg(c,d,a,b,words[i+3]||0,14,-187363961);
+    b=gg(b,c,d,a,words[i+8]||0,20,1163531501);
+    a=gg(a,b,c,d,words[i+13]||0,5,-1444681467);
+    d=gg(d,a,b,c,words[i+2]||0,9,-51403784);
+    c=gg(c,d,a,b,words[i+7]||0,14,1735328473);
+    b=gg(b,c,d,a,words[i+12]||0,20,-1926607734);
+    a=hh(a,b,c,d,words[i+5]||0,4,-378558);
+    d=hh(d,a,b,c,words[i+8]||0,11,-2022574463);
+    c=hh(c,d,a,b,words[i+11]||0,16,1839030562);
+    b=hh(b,c,d,a,words[i+14]||0,23,-35309556);
+    a=hh(a,b,c,d,words[i+1]||0,4,-1530992060);
+    d=hh(d,a,b,c,words[i+4]||0,11,1272893353);
+    c=hh(c,d,a,b,words[i+7]||0,16,-155497632);
+    b=hh(b,c,d,a,words[i+10]||0,23,-1094730640);
+    a=hh(a,b,c,d,words[i+13]||0,4,681279174);
+    d=hh(d,a,b,c,words[i+0]||0,11,-358537222);
+    c=hh(c,d,a,b,words[i+3]||0,16,-722521979);
+    b=hh(b,c,d,a,words[i+6]||0,23,76029189);
+    a=hh(a,b,c,d,words[i+9]||0,4,-640364487);
+    d=hh(d,a,b,c,words[i+12]||0,11,-421815835);
+    c=hh(c,d,a,b,words[i+15]||0,16,530742520);
+    b=hh(b,c,d,a,words[i+2]||0,23,-995338651);
+    a=ii(a,b,c,d,words[i+0]||0,6,-198630844);
+    d=ii(d,a,b,c,words[i+7]||0,10,1126891415);
+    c=ii(c,d,a,b,words[i+14]||0,15,-1416354905);
+    b=ii(b,c,d,a,words[i+5]||0,21,-57434055);
+    a=ii(a,b,c,d,words[i+12]||0,6,1700485571);
+    d=ii(d,a,b,c,words[i+3]||0,10,-1894986606);
+    c=ii(c,d,a,b,words[i+10]||0,15,-1051523);
+    b=ii(b,c,d,a,words[i+1]||0,21,-2054922799);
+    a=ii(a,b,c,d,words[i+8]||0,6,1873313359);
+    d=ii(d,a,b,c,words[i+15]||0,10,-30611744);
+    c=ii(c,d,a,b,words[i+6]||0,15,-1560198380);
+    b=ii(b,c,d,a,words[i+13]||0,21,1309151649);
+    a=ii(a,b,c,d,words[i+4]||0,6,-145523070);
+    d=ii(d,a,b,c,words[i+11]||0,10,-1120210379);
+    c=ii(c,d,a,b,words[i+2]||0,15,718787259);
+    b=ii(b,c,d,a,words[i+9]||0,21,-343485551);
+    a=add32(a,olda); b=add32(b,oldb); c=add32(c,oldc); d=add32(d,oldd);
+  }
+  function hex(num){
+    var out='';
+    for(var i=0;i<4;i++){ out += ('0'+((num>>(i*8))&0xFF).toString(16)).slice(-2); }
+    return out;
+  }
+  return hex(a)+hex(b)+hex(c)+hex(d);
+}
+
+/* 采集设备特征，组合成指纹再 MD5。
+   说明：这只是提高刷榜门槛，不是安全边界。 */
+function collectFingerprint(){
+  var parts=[];
+  try{ parts.push(navigator.hardwareConcurrency||0); }catch(e){}
+  try{ parts.push(screen.width+'x'+screen.height+'x'+(screen.colorDepth||0)); }catch(e){}
+  try{ parts.push(Intl.DateTimeFormat().resolvedOptions().timeZone||''); }catch(e){}
+  try{ parts.push(navigator.language||''); }catch(e){}
+  try{ parts.push(navigator.platform||''); }catch(e){}
+  try{ parts.push((navigator.userAgent||'').length); }catch(e){}
+  try{ parts.push((navigator.userAgent||'').slice(-40)); }catch(e){}
+  try{ parts.push(navigator.deviceMemory||0); }catch(e){}
+  try{ parts.push(navigator.maxTouchPoints||0); }catch(e){}
+  try{ parts.push('st:'+(navigator.storage&&navigator.storage.estimate?'1':'0')); }catch(e){}
+  // WebGL 渲染器信息（GPU 型号，区分度很高）
+  try{
+    var cv=document.createElement('canvas');
+    var gl=cv.getContext('webgl')||cv.getContext('experimental-webgl');
+    if(gl){
+      var dbg=gl.getExtension('WEBGL_debug_renderer_info');
+      if(dbg){
+        parts.push(gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL)||'');
+        parts.push(gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL)||'');
+      }
+    }
+  }catch(e){}
+  // 字体检测（粗略）
+  try{
+    var fonts=['Arial','Courier New','Georgia','Times New Roman','Verdana','Microsoft YaHei','SimSun'];
+    var probe=document.createElement('span');
+    probe.style.cssText='position:absolute;left:-9999px;font-size:72px;';
+    probe.textContent='mmmmmmmmmmlli';
+    document.body.appendChild(probe);
+    var base=probe.offsetWidth;
+    fonts.forEach(function(f){
+      probe.style.fontFamily='"'+f+'",monospace';
+      parts.push(f+':'+(probe.offsetWidth!==base?1:0));
+    });
+    document.body.removeChild(probe);
+  }catch(e){}
+  return parts.join('|');
+}
+
+/* 生成/读取设备码：优先用持久化的随机盐 + 指纹，保证同一设备稳定、清缓存后变成新身份 */
+function getDeviceId(){
+  var STORE='salary-ticker-device';
+  var salt='';
+  try{ salt=localStorage.getItem(STORE)||''; }catch(e){}
+  if(!salt){
+    salt=md5(String(Date.now())+Math.random()+String(navigator.userAgent));
+    try{ localStorage.setItem(STORE, salt); }catch(e){}
+  }
+  // 16 位足够，且符合服务端校验规则
+  return md5(salt+'|'+collectFingerprint()).slice(0,16);
+}
 /* ==================== CORE-END ==================== */
 
 var KEY='salary-ticker-v2';
@@ -1051,6 +1282,11 @@ var DEFAULT_SETTINGS={
   palette: 'green',    // 配色主题：green | red
   sound: false,
   showConv: true,
+  rankEnabled: false,   // 是否参与排行榜
+  nickname: '',         // 排行昵称
+  rankApi: '',          // 排行榜接口地址
+  totalWorkHours: 0,    // 累计工时（小时），用于工时榜
+  totalEarned: 0,       // 累计已赚，用于金额榜
   conversions: CONV_PRESETS.map(function(p){
     return {id:p.id, name:p.name, unit:p.unit, price:p.price, emoji:p.emoji,
             on:(p.id==='milktea'||p.id==='lunch'||p.id==='movie')};
@@ -1167,11 +1403,14 @@ function syncUI(keepInputs){
     $('inCurrency').value = settings.currency;
     $('inCustomOff').value = settings.customOff.join('\n');
     $('inCustomWork').value = settings.customWork.join('\n');
+    $('inNickname').value = settings.nickname || '';
+    $('inRankApi').value = settings.rankApi || '';
   }
   $('inHoliday').value = settings.holidayMode;
   $('inBasis').value = settings.payBasis;
   $('tglSound').classList.toggle('on', !!settings.sound);
   $('tglConv').classList.toggle('on', !!settings.showConv);
+  $('tglRank').classList.toggle('on', !!settings.rankEnabled);
   Array.prototype.forEach.call(document.querySelectorAll('#paletteChips button'), function(b){
     b.classList.toggle('on', b.dataset.palette===settings.palette);
   });
@@ -1626,6 +1865,9 @@ function render(){
   }
   lastStatus=st.code;
 
+  // 累积工时/已赚（供排行榜使用）
+  accumulateStats(d, now, st.code);
+
   requestAnimationFrame(render);
 }
 
@@ -1776,6 +2018,244 @@ document.addEventListener('keydown', function(e){
   if(e.key==='s'||e.key==='S'){ e.preventDefault(); $('drawer').classList.contains('on')?closeDrawer():openDrawer(); }
   if(e.key==='Escape') closeDrawer();
 });
+
+/* ---------------- 排行榜 ---------------- */
+var rankState = {
+  board: 'per_hour',
+  scope: 'global',
+  country: '',
+  loading: false,
+  lastPost: 0,
+  myDeviceId: '',
+};
+
+/* 规范化接口地址（去掉末尾斜杠） */
+function rankBase(){
+  var api=(settings.rankApi||'').trim().replace(/\/+$/,'');
+  return api;
+}
+
+function openRank(){
+  $('rankDrawer').classList.add('on');
+  $('mask').classList.add('on');
+  loadRank();
+}
+function closeRank(){
+  $('rankDrawer').classList.remove('on');
+  $('mask').classList.remove('on');
+}
+
+/* 渲染榜单列表 */
+function renderRank(data, err){
+  var box=$('rankList');
+  box.innerHTML='';
+  var foot=$('rankFoot');
+
+  if(err){
+    box.innerHTML='<div class="rank-empty">加载失败<br>'+escapeHtml(err)+'</div>';
+    foot.textContent='';
+    return;
+  }
+  if(!data || !data.list || !data.list.length){
+    box.innerHTML='<div class="rank-empty">还没有人上榜<br>去设置里开启排行榜吧</div>';
+    foot.textContent='';
+    return;
+  }
+
+  var myId=rankState.myDeviceId;
+  data.list.forEach(function(it){
+    var row=document.createElement('div');
+    row.className='rank-row';
+
+    var no=document.createElement('div');
+    no.className='rank-no'+(it.rank===1?' top1':it.rank===2?' top2':it.rank===3?' top3':'');
+    no.textContent = it.rank===1?'🥇':it.rank===2?'🥈':it.rank===3?'🥉':it.rank;
+
+    var info=document.createElement('div');
+    info.className='rank-info';
+    var name=document.createElement('div');
+    name.className='rank-name';
+    name.textContent=it.nickname || '匿名用户';
+    var meta=document.createElement('div');
+    meta.className='rank-meta';
+    var loc=it.countryName || it.country;
+    if(it.city) loc += ' · ' + it.city;
+    meta.textContent=loc;
+    info.appendChild(name); info.appendChild(meta);
+
+    var val=document.createElement('div');
+    val.className='rank-val';
+    var b=document.createElement('b');
+    var small=document.createElement('small');
+    if(rankState.board==='per_hour'){
+      b.textContent=settings.currency+fmtMoney(it.perHour,2);
+      small.textContent='时薪';
+    }else if(rankState.board==='work_hours'){
+      b.textContent=it.workHours.toFixed(0)+'h';
+      small.textContent='累计工时';
+    }else{
+      b.textContent=settings.currency+fmtMoney(it.earned,0);
+      small.textContent='累计已赚';
+    }
+    val.appendChild(b); val.appendChild(small);
+
+    row.appendChild(no); row.appendChild(info); row.appendChild(val);
+    box.appendChild(row);
+  });
+
+  foot.textContent = (data.scope==='country' ? '本地区' : '全球') + '共 ' + data.list.length + ' 人上榜';
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+/* 拉取榜单 */
+function loadRank(){
+  var base=rankBase();
+  if(!base){
+    renderRank(null, '未配置排行榜接口地址，请在设置里填写');
+    return;
+  }
+  var url=base + '/api/rank?board=' + encodeURIComponent(rankState.board)
+        + '&scope=' + encodeURIComponent(rankState.scope)
+        + '&limit=50';
+  if(rankState.scope==='country'){
+    url += '&country=' + encodeURIComponent(rankState.country || 'CN');
+  }
+  $('rankList').innerHTML='<div class="rank-empty">正在加载…</div>';
+
+  var done=false;
+  var timer=setTimeout(function(){
+    if(!done){ renderRank(null, '请求超时，请检查网络或接口地址'); }
+  }, 10000);
+
+  fetch(url, { method:'GET' }).then(function(r){
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }).then(function(data){
+    done=true; clearTimeout(timer);
+    renderRank(data, null);
+  }).catch(function(e){
+    done=true; clearTimeout(timer);
+    renderRank(null, '网络错误：' + (e && e.message ? e.message : e));
+  });
+}
+
+/* 上报自己的数据 */
+function postRank(auto){
+  var base=rankBase();
+  if(!base){ if(!auto) toast('请先在设置里填写排行榜接口地址'); return; }
+  if(!settings.rankEnabled){ if(!auto) toast('请先开启「参与排行榜」'); return; }
+
+  var now=new Date();
+  var d=computeAll(now, settings, cache);
+  var id = rankState.myDeviceId || getDeviceId();
+  rankState.myDeviceId = id;
+
+  var payload={
+    deviceId: id,
+    nickname: (settings.nickname||'').trim() || '匿名用户',
+    perHour: d.perHour,
+    perSecond: d.perSecond,
+    monthly: settings.monthly,
+    workHours: settings.totalWorkHours || 0,
+    earned: settings.totalEarned || 0,
+    payBasis: settings.payBasis,
+    currency: settings.currency
+  };
+
+  if(!auto) toast('正在上报…');
+
+  fetch(base + '/api/score', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function(r){
+    return r.json().then(function(j){ return {status:r.status, body:j}; });
+  }).then(function(res){
+    if(res.status===429){
+      if(!auto) toast('上报太频繁，请稍后再试');
+      return;
+    }
+    if(res.status!==200 || !res.body.ok){
+      if(!auto) toast('上报失败：' + (res.body.error||'未知错误'));
+      return;
+    }
+    rankState.country = res.body.country || '';
+    rankState.lastPost = Date.now();
+    if(!auto){
+      var rk=res.body.rank;
+      toast(rk ? ('上报成功，时薪排名第 ' + rk.rank + ' / ' + rk.total) : '上报成功');
+    }
+  }).catch(function(e){
+    if(!auto) toast('上报失败：' + (e && e.message ? e.message : '网络错误'));
+  });
+}
+
+/* 累积工时/已赚（每次 render 时更新，用于工时榜和金额榜）。
+   说明：只在「计薪中」状态累加，午休/下班不涨，和主界面数字口径一致。 */
+var lastAccumTs = 0;
+function accumulateStats(d, now, statusCode){
+  var ts = now.getTime();
+  if(!lastAccumTs){ lastAccumTs = ts; return; }
+  var delta = (ts - lastAccumTs) / 1000;
+  if(delta <= 0 || delta > 60){ lastAccumTs = ts; return; }   // 跳过异常间隔（切后台、休眠等）
+  if(statusCode === 'working'){
+    settings.totalWorkHours = (settings.totalWorkHours||0) + delta/3600;
+    settings.totalEarned = (settings.totalEarned||0) + d.perSecond*delta;
+  }
+  lastAccumTs = ts;
+}
+
+$('btnRank').addEventListener('click', openRank);
+$('btnRankClose').addEventListener('click', closeRank);
+
+Array.prototype.forEach.call(document.querySelectorAll('.rank-tab'), function(b){
+  b.addEventListener('click', function(){
+    rankState.board=b.dataset.board;
+    Array.prototype.forEach.call(document.querySelectorAll('.rank-tab'), function(x){
+      x.classList.toggle('on', x===b);
+    });
+    loadRank();
+  });
+});
+Array.prototype.forEach.call(document.querySelectorAll('.rank-scopebtn'), function(b){
+  b.addEventListener('click', function(){
+    rankState.scope=b.dataset.scope;
+    Array.prototype.forEach.call(document.querySelectorAll('.rank-scopebtn'), function(x){
+      x.classList.toggle('on', x===b);
+    });
+    loadRank();
+  });
+});
+
+$('tglRank').addEventListener('click', function(){
+  settings.rankEnabled=!settings.rankEnabled;
+  applySettings(true);
+  if(settings.rankEnabled){
+    toast('已开启排行榜，将每 5 分钟自动上报');
+    postRank(false);
+  }else{
+    toast('已关闭排行榜');
+  }
+});
+$('inNickname').addEventListener('input', function(){
+  settings.nickname=this.value.slice(0,16);
+  applySettings(false);
+});
+$('inRankApi').addEventListener('input', function(){
+  settings.rankApi=this.value.trim();
+  applySettings(false);
+});
+$('btnRankPost').addEventListener('click', function(){ postRank(false); });
+
+/* 定时上报：每 5 分钟一次（仅开启时） */
+setInterval(function(){
+  if(settings.rankEnabled && rankBase()) postRank(true);
+}, 5*60*1000);
 
 /* ---------------- boot ---------------- */
 applyAppearance();
