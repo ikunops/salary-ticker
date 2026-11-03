@@ -393,6 +393,81 @@ html[data-mode="light"] .time-btn{color:#5b6b82}
 /* 数字输入框的上下箭头在深色下也保持可见 */
 .input::-webkit-inner-spin-button{opacity:.55}
 html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
+
+/* ===================== 移动端适配 ===================== */
+@media (max-width:760px){
+  .wrap{padding:12px clamp(10px,3vw,16px) calc(20px + env(safe-area-inset-bottom))}
+  /* 顶栏：单行紧凑，不换行 */
+  .topbar{gap:8px;margin-bottom:12px;flex-wrap:nowrap}
+  .logo{width:34px;height:34px;border-radius:10px;font-size:16px}
+  .brand h1{font-size:15px}
+  .brand{gap:8px;flex:0 1 auto;min-width:0}
+  .topbar-right{gap:6px;flex:0 0 auto}
+  .badge{padding:5px 9px;font-size:11.5px;gap:5px}
+  .badge i{width:6px;height:6px}
+  .clock{font-size:11.5px;letter-spacing:0}
+  .icon-btn{width:34px;height:34px;border-radius:10px;font-size:15px}
+  .mode-toggle{min-width:34px;padding:0 8px}
+  .mode-txt{display:none}          /* 手机上只留图标 */
+  /* 金额区 */
+  .hero{padding:14px}
+  .amount{margin:12px 0 4px;font-size:clamp(34px,13.5vw,64px);letter-spacing:-.035em}
+  .amount .cur{font-size:.40em;margin-right:3px}
+  .amount .frac{font-size:.46em}
+  .hero-sub{font-size:12px}
+  .timeline{margin:14px 0 2px}
+  .tl-track{height:10px;gap:3px}
+  .tl-labels{margin-top:5px;font-size:10.5px}
+  .hero-foot{margin-top:10px}
+  .conv-chips{gap:6px;justify-content:flex-start}
+  .conv-chips .chip{padding:5px 9px;font-size:11.5px}
+  /* 数据卡：两列更省纵向空间 */
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .stat{padding:12px 13px}
+  .stat h3{font-size:11px;margin-bottom:9px}
+  .kv{font-size:12.5px;padding:3px 0}
+  .kv.big span:last-child{font-size:18px}
+  .bar{height:6px;margin:8px 0 6px}
+  /* 底部三张汇总卡保持一排 */
+  .chips-row{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:9px}
+  .mchip{padding:10px 11px;border-radius:12px}
+  .mchip small{font-size:10.5px;margin-bottom:3px}
+  .mchip b{font-size:15px}
+  /* 设置抽屉：全屏、大触控区 */
+  .drawer{width:100vw;border-left:0}
+  .drawer-head{padding:14px 16px}
+  .drawer-body{padding:4px 16px 24px}
+  .field{padding:12px 0}
+  .field > label{font-size:12px;margin-bottom:8px}
+  .input,select,textarea{font-size:16px}   /* 16px 防止 iOS 聚焦时自动放大 */
+  .time-input{font-size:16px}
+  .seg-row{gap:6px}
+  .seg-del{width:34px;height:34px;flex:0 0 34px}
+  .week button{padding:11px 0;font-size:14px}
+  .chips button{padding:9px 14px;font-size:13px}
+  .conv-item{padding:9px 10px}
+  .conv-item .cname{font-size:13.5px}
+  .toast{left:12px;right:12px;transform:translateY(20px);bottom:calc(16px + env(safe-area-inset-bottom));width:auto}
+  .toast.on{transform:translateY(0)}
+}
+/* 超窄屏（小屏安卓 / 横屏） */
+@media (max-width:380px){
+  .clock{display:none}
+  .grid{gap:8px}
+  .amount{font-size:clamp(30px,12.5vw,52px)}
+  .chips-row{gap:6px}
+  .mchip b{font-size:13.5px}
+}
+/* 横屏矮屏：压缩纵向留白 */
+@media (max-height:480px) and (orientation:landscape){
+  .amount{font-size:clamp(30px,8vw,52px);margin:8px 0 2px}
+  .timeline{margin:10px 0 2px}
+  .wrap{padding-top:8px}
+}
+/* 触屏设备：去掉 hover 位移，避免点完“跳一下” */
+@media (hover:none){
+  .icon-btn:hover,.mchip:hover,.btn:hover{transform:none}
+}
 </style>
 </head>
 <body>

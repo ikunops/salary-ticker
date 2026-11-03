@@ -93,8 +93,25 @@ if (!gotLock) {
     }
   });
 
+  // 全局兜底：任何未捕获异常都弹窗提示，而不是静默闪退
+  process.on('uncaughtException', (err) => {
+    try {
+      dialog.showErrorBox('工资秒表 - 运行出错',
+        '程序遇到问题：\n\n' + (err && err.message ? err.message : String(err)) +
+        '\n\n可以尝试右键“以管理员身份运行”，或直接双击同目录的 index.html 用浏览器打开。');
+    } catch (_) {}
+  });
+
   app.whenReady().then(() => {
-    createWindow();
+    try {
+      createWindow();
+    } catch (e) {
+      dialog.showErrorBox('工资秒表 - 启动失败',
+        '无法创建窗口：\n\n' + (e && e.message ? e.message : String(e)) +
+        '\n\n可以尝试右键“以管理员身份运行”，或直接双击 index.html 用浏览器打开。');
+      app.quit();
+      return;
+    }
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });

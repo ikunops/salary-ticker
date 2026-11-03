@@ -40,7 +40,7 @@
     ],
     "windows": {
       "webviewInstallMode": {
-        "type": "downloadBootstrapper"
+        "type": "embedBootstrapper"
       },
       "nsis": {
         "languages": ["SimpChinese", "English"],
