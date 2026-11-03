@@ -48,10 +48,28 @@ if (r.status !== 0) {
 // 报告产物
 const dist = path.join(root, 'dist');
 if (fs.existsSync(dist)) {
-  const files = fs.readdirSync(dist).filter(f => f.endsWith('.exe'));
+  const files = fs.readdirSync(dist).filter(f => /\.(exe|zip)$/i.test(f));
   files.forEach(f => {
     const p = path.join(dist, f);
     const mb = (fs.statSync(p).size / 1024 / 1024).toFixed(2);
     console.log('[build-win] 产物: dist\\' + f + '  ' + mb + ' MB');
   });
+}
+
+// 额外产出一份「免安装目录版」zip：解压即用，完全不依赖 %TEMP%，最稳
+const unpacked = path.join(dist, 'win-unpacked');
+if (fs.existsSync(unpacked)) {
+  const seven = path.join(root, 'node_modules', '7zip-bin', 'win', 'x64', '7za.exe');
+  const zipOut = path.join(dist, 'SalaryTicker-win-x64-免安装版.zip');
+  fs.rmSync(zipOut, { force: true });
+  console.log('[build-win] 打包免安装目录版…');
+  try {
+    spawnSync(seven, ['a', '-tzip', '-mx=5', zipOut, '.'], { cwd: unpacked, stdio: 'ignore', env });
+    if (fs.existsSync(zipOut)) {
+      const mb = (fs.statSync(zipOut).size / 1024 / 1024).toFixed(2);
+      console.log('[build-win] 产物: dist\\SalaryTicker-win-x64-免安装版.zip  ' + mb + ' MB');
+    }
+  } catch (e) {
+    console.warn('[build-win] 免安装 zip 打包失败: ' + e.message);
+  }
 }

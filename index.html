@@ -418,6 +418,12 @@ html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
 .rank-modal .rank-boards{padding:14px 18px 0;margin:0 0 10px}
 .rank-modal .rank-scope{padding:0 18px;margin:0 0 12px}
 .rank-modal .rank-foot{padding:12px 18px 14px;margin-top:0;border-top:1px solid var(--line)}
+/* 弹窗底部的「我的参与设置」 */
+.rank-me{padding:12px 18px 4px;border-top:1px solid var(--line);background:var(--input-bg)}
+.rank-me-row{display:flex;align-items:center;gap:10px}
+.rank-nick{flex:1;min-width:0;font-size:13px;padding:8px 11px}
+.rank-me-tip{font-size:11px;color:var(--muted);line-height:1.7;margin-top:7px}
+.rank-post{margin-top:9px;padding:9px;font-size:12.5px}
 .rank-boards{display:flex;gap:6px}
 .rank-tab{
   flex:1;padding:9px 0;border-radius:10px;border:1px solid var(--line);
@@ -678,20 +684,6 @@ html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
     </div>
 
     <div class="field">
-      <label>排行榜</label>
-      <div class="switch"><span>参与排行榜</span><div class="tgl" id="tglRank"></div></div>
-      <div class="row" style="margin-top:10px">
-        <input class="input" id="inNickname" type="text" maxlength="16" placeholder="昵称（默认：匿名用户）">
-      </div>
-      <div class="hint-muted" id="rankHint">开启后会把时薪、工时、地区上报到云端参与排名，不收集任何账号信息</div>
-      <button class="btn" id="btnRankPost" style="margin-top:10px">立即上报一次</button>
-      <!-- 接口地址内置，普通用户无需关心；开发调试时可在控制台设置 localStorage 覆盖 -->
-      <div id="rankApiDev" style="display:none;margin-top:10px">
-        <input class="input" id="inRankApi" type="text" placeholder="接口地址（仅开发用）">
-      </div>
-    </div>
-
-    <div class="field">
       <label>换算物品（点击勾选，价格可改）</label>
       <div class="conv-list" id="convList"></div>
       <div class="row" style="margin-top:10px">
@@ -733,6 +725,15 @@ html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
   </div>
   <div class="modal-body rank-list" id="rankList">
     <div class="rank-empty">正在加载…</div>
+  </div>
+  <!-- 底部：我的参与设置，直接在这里操作，不用进设置面板 -->
+  <div class="rank-me" id="rankMe">
+    <div class="rank-me-row">
+      <input class="input rank-nick" id="inNickname" type="text" maxlength="16" placeholder="昵称（默认匿名）">
+      <div class="tgl" id="tglRank" title="参与排行榜"></div>
+    </div>
+    <div class="rank-me-tip" id="rankHint">开启后会上报时薪、工时与地区，不收集账号信息</div>
+    <button class="btn rank-post" id="btnRankPost">立即上报我的数据</button>
   </div>
   <div class="rank-foot" id="rankFoot"></div>
 </div>
@@ -1429,7 +1430,6 @@ function syncUI(keepInputs){
     $('inCustomOff').value = settings.customOff.join('\n');
     $('inCustomWork').value = settings.customWork.join('\n');
     $('inNickname').value = settings.nickname || '';
-    $('inRankApi').value = settings.rankApi || '';
   }
   $('inHoliday').value = settings.holidayMode;
   $('inBasis').value = settings.payBasis;
@@ -2302,10 +2302,6 @@ $('tglRank').addEventListener('click', function(){
 });
 $('inNickname').addEventListener('input', function(){
   settings.nickname=this.value.slice(0,16);
-  applySettings(false);
-});
-$('inRankApi').addEventListener('input', function(){
-  settings.rankApi=this.value.trim();
   applySettings(false);
 });
 $('btnRankPost').addEventListener('click', function(){ postRank(false); });

@@ -45,12 +45,32 @@
         {
           "target": "portable",
           "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        },
+        {
+          "target": "nsis",
+          "arch": ["x64"]
         }
       ],
       "icon": "build/icon.png",
       "signAndEditExecutable": false,
       "sign": null,
       "artifactName": "SalaryTicker-${version}-win-x64-electron.${ext}"
+    },
+    "portable": {
+      "artifactName": "SalaryTicker-${version}-win-x64-免安装单文件.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "工资秒表",
+      "artifactName": "SalaryTicker-${version}-win-x64-electron-setup.${ext}"
     },
     "mac": {
       "target": [
