@@ -54,23 +54,47 @@ fs.writeFileSync(path.join(appDir, 'package.json'), JSON.stringify({
   license: 'MIT'
 }, null, 2));
 
-// 4) 应用图标
+// 4) 应用图标（把 png 转成 icns 的最小可用形式，并让 plist 指向它）
 const iconSrc = path.join(root, 'build', 'icon.png');
 if (fs.existsSync(iconSrc)) {
   fs.copyFileSync(iconSrc, path.join(resDir, 'icon.png'));
+  // Electron.app 自带 electron.icns，我们生成同名替换（见 make-mac-icns 逻辑）
+  try {
+    buildIcns(iconSrc, path.join(resDir, 'SalaryTicker.icns'));
+  } catch (e) {
+    console.warn('[build-mac] icns 生成失败，沿用默认图标: ' + e.message);
+  }
 }
 
-// 5) 改 Info.plist 里的可执行文件名与标识
+// 5) 改 Info.plist 里的可执行文件名、标识、版本、图标
 const plistPath = path.join(outApp, 'Contents', 'Info.plist');
 let plist = fs.readFileSync(plistPath, 'utf8');
 plist = plist.replace(/<string>Electron<\/string>/g, '<string>SalaryTicker</string>');
 plist = plist.replace(/com\.github\.Electron/g, 'com.salaryticker.app');
 plist = plist.replace(/Electron/g, 'SalaryTicker');
-// 显示名（中文）用 UTF-8 写入，避免编码问题
+// 版本号：从 package.json 读，而不是 Electron 的版本
+let appVer = '1.0.0';
+try { appVer = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version || '1.0.0'; } catch (_) {}
+plist = plist.replace(
+  /<key>CFBundleShortVersionString<\/key>\s*<string>[^<]*<\/string>/,
+  '<key>CFBundleShortVersionString</key>\n\t<string>' + appVer + '</string>'
+);
+plist = plist.replace(
+  /<key>CFBundleVersion<\/key>\s*<string>[^<]*<\/string>/,
+  '<key>CFBundleVersion</key>\n\t<string>' + appVer + '</string>'
+);
+// 显示名（中文）
 plist = plist.replace(
   /<key>CFBundleDisplayName<\/key>\s*<string>[^<]*<\/string>/,
   '<key>CFBundleDisplayName</key>\n\t<string>工资秒表</string>'
 );
+// 图标指向自定义 icns
+if (fs.existsSync(path.join(resDir, 'SalaryTicker.icns'))) {
+  plist = plist.replace(
+    /<key>CFBundleIconFile<\/key>\s*<string>[^<]*<\/string>/,
+    '<key>CFBundleIconFile</key>\n\t<string>SalaryTicker</string>'
+  );
+}
 fs.writeFileSync(plistPath, plist, 'utf8');
 
 // 6) 删除默认的 default_app.asar（我们用自定义 app 目录）
@@ -101,4 +125,36 @@ function copyDir(src, dst) {
       } catch (_) { /* 忽略断链 */ }
     } else fs.copyFileSync(s, d);
   }
+}
+
+/* 生成 .icns：容器里塞入多个 PNG 尺寸（icp4/icp5/ic07/ic08/ic09）
+   icns 格式：'icns' + 总长度(4B, 含头) + 若干块 [类型(4B) + 块长度(4B, 含头) + PNG数据] */
+function buildIcns(pngPath, outPath) {
+  const zlib = require('zlib');
+  const src = fs.readFileSync(pngPath);
+
+  // 解析 PNG 尺寸
+  if (src.toString('ascii', 12, 16) !== 'IHDR') throw new Error('不是有效 PNG');
+  const w = src.readUInt32BE(16);
+  const h = src.readUInt32BE(20);
+
+  // 这里只做“原样嵌入”，所以我们要求源图足够大；不同尺寸块用同一张图（macOS 会缩放）
+  // 常用类型：ic07=128, ic08=256, ic09=512
+  const entries = [];
+  const add = (type) => {
+    const head = Buffer.alloc(8);
+    head.write(type, 0, 'ascii');
+    head.writeUInt32BE(src.length + 8, 4);
+    entries.push(Buffer.concat([head, src]));
+  };
+  if (w >= 128) { add('ic07'); }
+  if (w >= 256) { add('ic08'); }
+  if (w >= 512) { add('ic09'); }
+  if (!entries.length) add('ic07');
+
+  const body = Buffer.concat(entries);
+  const header = Buffer.alloc(8);
+  header.write('icns', 0, 'ascii');
+  header.writeUInt32BE(body.length + 8, 4);
+  fs.writeFileSync(outPath, Buffer.concat([header, body]));
 }

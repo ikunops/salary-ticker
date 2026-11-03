@@ -8,11 +8,16 @@
 
 ## 下载使用
 
-| 平台 | 文件 | 说明 |
-|---|---|---|
-| Windows | `SalaryTicker_1.0.0_x64-setup.exe` | 安装包，约 1.07 MB |
-| Windows | `SalaryTicker-win.exe` | 免安装绿色版，约 2.96 MB |
-| macOS | `SalaryTicker_1.0.0_*_x64.dmg` / `_aarch64.dmg` | Intel / Apple Silicon，见「构建」 |
+| 平台 | 文件 | 大小 | 说明 |
+|---|---|---|---|
+| Windows | `SalaryTicker_1.0.0_x64-setup.exe` | 1.07 MB | 安装包，推荐 |
+| Windows | `SalaryTicker-win.exe` | 2.96 MB | 免安装绿色版 |
+| macOS | `SalaryTicker-1.0.0-mac-arm64.zip` | 90.8 MB | Apple Silicon（M 系列） |
+| macOS | `SalaryTicker-1.0.0-mac-x64.zip` | 95.0 MB | Intel 芯片 |
+
+> macOS 包较大是因为基于 Electron（自带 Chromium 内核）。
+> Windows 版基于 Tauri，复用系统 WebView2，所以只有 1~3 MB。
+> 安装细节见 [docs-mac安装说明.md](docs-mac安装说明.md) 和 [docs-安全提示说明.md](docs-安全提示说明.md)。
 
 Windows 版基于 **Tauri + 系统 WebView2**，体积只有几 MB（Electron 方案同功能需 69 MB）。
 
@@ -45,6 +50,7 @@ Windows 版基于 **Tauri + 系统 WebView2**，体积只有几 MB（Electron �
 - 倒计时：距下班、距上班、距午休结束
 - 进度条随视角变化：今日按工作时段、本月按整月日历、本年按 12 个月
 - 换算显示：赚到的钱 ≈ 几杯奶茶 / 几份午饭 / 几张电影票（12 种预设，可勾选、改价、自定义）
+- 三种主题：暗夜绿 / 浅色 / 人民币红
 - 快捷键：`S` 打开设置，`Esc` 关闭
 
 ### 设置项
