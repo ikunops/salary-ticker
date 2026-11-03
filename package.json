@@ -61,7 +61,7 @@
       "artifactName": "SalaryTicker-${version}-win-x64-electron.${ext}"
     },
     "portable": {
-      "artifactName": "SalaryTicker-${version}-win-x64-免安装单文件.${ext}"
+      "artifactName": "SalaryTicker-${version}-win-x64-portable.${ext}"
     },
     "nsis": {
       "oneClick": false,

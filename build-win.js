@@ -60,7 +60,7 @@ if (fs.existsSync(dist)) {
 const unpacked = path.join(dist, 'win-unpacked');
 if (fs.existsSync(unpacked)) {
   const seven = path.join(root, 'node_modules', '7zip-bin', 'win', 'x64', '7za.exe');
-  const zipOut = path.join(dist, 'SalaryTicker-win-x64-免安装版.zip');
+  const zipOut = path.join(dist, 'SalaryTicker-1.0.0-win-x64-folder.zip');
   fs.rmSync(zipOut, { force: true });
   console.log('[build-win] 打包免安装目录版…');
   try {
