@@ -1,4 +1,4 @@
-// 用内存版「假 D1」测试 Worker API 逻辑（不依赖 wrangler / 网络）
+﻿// 用内存版「假 D1」测试 Worker API 逻辑（不依赖 wrangler / 网络）
 const fs = require('fs');
 const path = require('path');
 
@@ -62,7 +62,8 @@ class FakeD1 {
     if (/FROM scores/.test(sql) && /ORDER BY/.test(sql)) {
       const col = sql.match(/ORDER BY (\w+) DESC/)[1];
       let rows = [...this.scores.values()];
-      if (/WHERE country = \?/.test(sql)) rows = rows.filter(r => r.country === b[0]);
+      if (/WHERE country = \? AND city = \?/.test(sql)) rows = rows.filter(r => r.country === b[0] && r.city === b[1]);
+    else if (/WHERE country = \?/.test(sql)) rows = rows.filter(r => r.country === b[0]);
       rows.sort((a, z) => (z[col] - a[col]) || (z.updated_at - a.updated_at));
       const limit = b[b.length - 1];
       return { results: rows.slice(0, limit) };

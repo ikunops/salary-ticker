@@ -173,8 +173,11 @@ async function getRank(url, env) {
   const board = BOARDS.includes(url.searchParams.get('board'))
     ? url.searchParams.get('board')
     : 'per_hour';
-  const scope = url.searchParams.get('scope') === 'country' ? 'country' : 'global';
+  // scope: global(全国) | city(本市)
+  const rawScope = url.searchParams.get('scope');
+  const scope = rawScope === 'city' ? 'city' : (rawScope === 'country' ? 'country' : 'global');
   const country = clean(url.searchParams.get('country'), 8) || 'CN';
+  const city = clean(url.searchParams.get('city'), 32) || '';
   const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '50', 10) || 50, 1), 100);
 
   // board 已白名单校验，可直接拼接（不能作为参数绑定列名）
@@ -182,7 +185,16 @@ async function getRank(url, env) {
                     work_hours, earned, pay_basis, updated_at
              FROM scores`;
   const binds = [];
-  if (scope === 'country') {
+  if (scope === 'city') {
+    // 按城市筛选；没传城市时退化为按国家，避免查出空列表
+    if (city) {
+      sql += ' WHERE country = ? AND city = ?';
+      binds.push(country, city);
+    } else {
+      sql += ' WHERE country = ?';
+      binds.push(country);
+    }
+  } else if (scope === 'country') {
     sql += ' WHERE country = ?';
     binds.push(country);
   }
@@ -207,7 +219,13 @@ async function getRank(url, env) {
     updatedAt: r.updated_at,
   }));
 
-  return json({ board, scope, country: scope === 'country' ? country : null, list });
+  return json({
+    board,
+    scope,
+    country: scope === 'global' ? null : country,
+    city: scope === 'city' ? city : null,
+    list,
+  });
 }
 
 async function getStats(env) {
