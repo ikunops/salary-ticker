@@ -47,8 +47,8 @@ function makeEnv(seed){
   const decBtns  = [0,2,3,4].map(d => { const b = mkEl('button'); b.dataset.dec = String(d); return b; });
   const tabBtns  = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
   const mchips   = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
-  const themeBtns = ['dark','light','red'].map(t => { const b = mkEl('button'); b.dataset.theme = t; return b; });
-  const qmap = { '#weekRow button': weekBtns, '#decChips button': decBtns, '#themeChips button': themeBtns,
+  const paletteBtns = ['green','red'].map(t => { const b = mkEl('button'); b.dataset.palette = t; return b; });
+  const qmap = { '#weekRow button': weekBtns, '#decChips button': decBtns, '#paletteChips button': paletteBtns,
                  '#tabs button': tabBtns, '.mchip': mchips };
   const store = {};
   if (seed) Object.assign(store, seed);
@@ -67,7 +67,7 @@ function makeEnv(seed){
   };
   const rafQ = [];
   const requestAnimationFrame = fn => { rafQ.push(fn); };
-  return { byId, document, localStorage, store, rafQ, requestAnimationFrame, weekBtns, decBtns, tabBtns, mchips };
+  return { byId, document, localStorage, store, rafQ, requestAnimationFrame, weekBtns, decBtns, tabBtns, mchips, paletteBtns };
 }
 
 const FIXED = new Date(2026, 10, 2, 14, 23, 45).getTime();
@@ -135,10 +135,11 @@ check('旧 milkPrice 迁到奶茶单价', () => {
   const mt = saved.conversions.find(c => c.id === 'milktea');
   return mt && mt.price === 22 && mt.on === true;
 });
-check('theme 迁移为 light', () => saved.theme === 'light');
+check('旧 theme=light 迁移为 mode=light', () => saved.mode === 'light');
 check('showConv 由旧 showMilk 推导', () => saved.showConv === true);
 check('旧数据无 breaks → 补空数组', () => Array.isArray(saved.breaks) && saved.breaks.length === 0);
-check('启动后主题已应用到 html', () => env.document.documentElement['data-theme'] === 'light');
+check('启动后明暗模式已应用到 html', () => env.document.documentElement['data-mode'] === 'light');
+check('启动后配色主题已应用到 html', () => env.document.documentElement['data-palette'] === 'green');
 
 console.log('\n=== 3. 添加 / 删除休息时段 ===');
 env = boot();
@@ -231,6 +232,38 @@ const yearHero = num(env.byId['heroInt'].textContent);
 check('点「本年」卡片后主金额切到本年累计(更大)', () => yearHero > todayHero);
 check('切换后顶部 tab 高亮同步', () =>
   env.tabBtns.find(b => b.dataset.tab === 'year').classList.contains('active') === true);
+console.log('\n=== 5d. 明暗模式 × 配色主题 两个独立维度 ===');
+env = boot();
+// 默认：暗夜 + 青绿
+check('默认 mode=dark', () => env.document.documentElement['data-mode'] === 'dark');
+check('默认 palette=green', () => env.document.documentElement['data-palette'] === 'green');
+check('右上角按钮显示「暗夜」', () => env.byId['modeText'].textContent === '暗夜');
+
+// 点右上角切浅色
+env.byId['btnMode'].fire('click'); env.drain(2);
+check('切换后 mode=light', () => env.document.documentElement['data-mode'] === 'light');
+check('按钮文字变「浅色」', () => env.byId['modeText'].textContent === '浅色');
+check('切换明暗不影响配色', () => env.document.documentElement['data-palette'] === 'green');
+
+// 再点回暗夜
+env.byId['btnMode'].fire('click'); env.drain(2);
+check('再切回 mode=dark', () => env.document.documentElement['data-mode'] === 'dark');
+
+// 选红橙配色
+const redBtn = env.paletteBtns.find(b => b.dataset.palette === 'red');
+redBtn.fire('click'); env.drain(2);
+check('选红橙后 palette=red', () => env.document.documentElement['data-palette'] === 'red');
+check('选红橙不影响明暗', () => env.document.documentElement['data-mode'] === 'dark');
+
+// 暗夜+红橙 → 切浅色，配色应保持红橙
+env.byId['btnMode'].fire('click'); env.drain(2);
+check('浅色+红橙 组合成立', () => env.document.documentElement['data-mode'] === 'light' && env.document.documentElement['data-palette'] === 'red');
+check('设置面板红橙按钮高亮', () => env.paletteBtns.find(b => b.dataset.palette === 'red').classList.contains('on') === true);
+
+// 持久化
+saved = JSON.parse(env.store['salary-ticker-v2']);
+check('mode 已持久化', () => saved.mode === 'light');
+check('palette 已持久化', () => saved.palette === 'red');
 console.log('\n=== 6. 关闭换算总开关 ===');
 env.byId['tglConv'].fire('click');
 env.drain(2);

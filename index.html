@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="zh-CN" data-mode="dark" data-palette="green">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -8,33 +8,47 @@
 <style>
 :root{
   color-scheme: dark;
+  /* ===== 暗夜模式：底色固定，不随配色主题变化 ===== */
   --bg:#070a10; --panel:rgba(255,255,255,.045); --panel2:rgba(255,255,255,.075);
   --line:rgba(255,255,255,.10); --text:#e8eef7; --muted:#8895ab;
-  --accent:#3ddc97; --accent2:#43b3ff; --warn:#ffb84d; --danger:#ff6b81;
+  --warn:#ffb84d; --danger:#ff6b81;
   --radius:18px; --shadow:0 24px 60px rgba(0,0,0,.45);
   --track:rgba(255,255,255,.09);
   --input-bg:#141a25; --input-line:rgba(255,255,255,.16);
-  --accent-rgb:61,220,151; --accent2-rgb:67,179,255; --logo-a:#4ff0ac; --logo-b:#18b47a; --logo-fg:#06281c;
+  --tl-accent:#57f0b0;
+  /* 默认配色：青绿 */
+  --accent:#3ddc97; --accent2:#43b3ff;
+  --accent-rgb:61,220,151; --accent2-rgb:67,179,255;
+  --logo-a:#4ff0ac; --logo-b:#18b47a; --logo-fg:#06281c;
+  --glow-a:.16; --glow-b:.14; --glow-c:.06;
 }
-html[data-theme="light"]{
+/* ===== 浅色模式：底色固定 ===== */
+html[data-mode="light"]{
   color-scheme: light;
   --bg:#eef3fa; --panel:#ffffff; --panel2:#f6f9fe; --line:rgba(15,30,60,.10);
-  --text:#0d1b2a; --muted:#5b6b82; --accent:#0f9d63; --accent2:#1b7fd4;
+  --text:#0d1b2a; --muted:#5b6b82;
   --warn:#c07800; --danger:#d84359; --shadow:0 18px 40px rgba(20,40,80,.12);
   --track:rgba(15,30,60,.09);
   --input-bg:#ffffff; --input-line:rgba(15,30,60,.18);
-  --accent-rgb:15,157,99; --accent2-rgb:27,127,212; --logo-a:#2ec78c; --logo-b:#0f9d63; --logo-fg:#ffffff;
+  --tl-accent:#1fbf85;
+  --glow-a:.13; --glow-b:.12; --glow-c:.04;
 }
-/* 红橙主题：取人民币红为主色，橙金为辅助色 */
-html[data-theme="red"]{
-  color-scheme: dark;
-  --bg:#12080a; --panel:rgba(255,255,255,.05); --panel2:rgba(255,255,255,.08);
-  --line:rgba(255,190,170,.14); --text:#fdeeea; --muted:#b08e8a;
-  --accent:#e6352b; --accent2:#ff9034; --warn:#ffb84d; --danger:#ff6b81;
-  --radius:18px; --shadow:0 24px 60px rgba(40,0,0,.5);
-  --track:rgba(255,190,170,.12);
-  --accent-rgb:230,53,43; --accent2-rgb:255,144,52; --logo-a:#ff6a52; --logo-b:#c8102e; --logo-fg:#fff5f2;
-  --input-bg:#221012; --input-line:rgba(255,190,170,.22);
+
+/* ===== 配色主题：只改强调色，不改底色 =====
+   青绿（默认，见 :root） / 红橙 —— 两套都定义在暗夜与浅色之上 */
+html[data-palette="red"]{
+  --accent:#bb112b;        /* 人民币 100 元券主色调 */
+  --accent2:#e8661f;       /* 橙金辅助色 */
+  --accent-rgb:187,17,43;
+  --accent2-rgb:232,102,31;
+  --logo-a:#e0223f; --logo-b:#8e0c20; --logo-fg:#fff2f0;
+  --tl-accent:#f0425a;
+}
+html[data-mode="light"][data-palette="red"]{
+  --accent:#bb112b; --accent2:#d4520f;
+  --accent-rgb:187,17,43; --accent2-rgb:212,82,15;
+  --logo-a:#d01f3c; --logo-b:#8e0c20; --logo-fg:#ffffff;
+  --tl-accent:#c9102c;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -47,11 +61,11 @@ body{
 body::before{
   content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
   background:
-    radial-gradient(900px 520px at 12% -10%, rgba(var(--accent-rgb),.16), transparent 65%),
-    radial-gradient(800px 500px at 92% 8%, rgba(var(--accent2-rgb),.14), transparent 62%),
-    radial-gradient(700px 700px at 50% 120%, rgba(var(--accent-rgb),.06), transparent 70%);
+    radial-gradient(900px 520px at 12% -10%, rgba(var(--accent-rgb),var(--glow-a)), transparent 65%),
+    radial-gradient(800px 500px at 92% 8%, rgba(var(--accent2-rgb),var(--glow-b)), transparent 62%),
+    radial-gradient(700px 700px at 50% 120%, rgba(var(--accent-rgb),var(--glow-c)), transparent 70%);
 }
-html[data-theme="light"] body::before{
+html[data-mode="light"] body::before{
   background:
     radial-gradient(900px 520px at 12% -10%, rgba(var(--accent-rgb),.14), transparent 65%),
     radial-gradient(800px 500px at 92% 8%, rgba(var(--accent2-rgb),.12), transparent 62%);
@@ -89,6 +103,10 @@ html[data-theme="light"] body::before{
   color:var(--text);font-size:17px;cursor:pointer;transition:.18s;line-height:1;
 }
 .icon-btn:hover{background:var(--panel2);transform:translateY(-1px)}
+/* 右上角明暗切换 */
+.mode-toggle{width:auto;min-width:76px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:600;line-height:1}
+.mode-ico{font-size:14px;line-height:1}
+.mode-txt{letter-spacing:.02em}
 
 /* ---------- cards ---------- */
 .card{
@@ -113,10 +131,13 @@ html[data-theme="light"] body::before{
   text-shadow:0 0 44px rgba(var(--accent-rgb),.28);
   white-space:nowrap;
 }
-html[data-theme="light"] .amount{text-shadow:none}
+html[data-mode="light"] .amount{text-shadow:none}
 .amount .cur{font-size:.44em;font-weight:700;color:var(--muted);margin-right:6px;letter-spacing:0}
 .amount .frac{font-size:.5em;font-weight:700;color:var(--accent);opacity:.95;letter-spacing:-.01em}
-#heroInt{background:linear-gradient(180deg,var(--text),color-mix(in srgb,var(--text) 70%, var(--accent)));
+#heroInt{background:linear-gradient(160deg,
+    color-mix(in srgb,var(--text) 82%, var(--accent)) 0%,
+    var(--accent) 78%,
+    color-mix(in srgb,var(--accent) 75%, #000) 100%);
   -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .hero-sub{color:var(--muted);font-size:13px;position:relative;z-index:1;font-variant-numeric:tabular-nums}
 .hero-sub b{color:var(--text);font-weight:600}
@@ -304,8 +325,8 @@ textarea{resize:vertical;min-height:66px;font-size:13px;line-height:1.7;font-fam
 }
 .time-btn:hover{background:rgba(127,127,127,.16);color:var(--text)}
 .time-btn svg{width:15px;height:15px;display:block;pointer-events:none}
-html[data-theme="dark"] .time-btn,html[data-theme="red"] .time-btn{color:#c9a8a2}
-html[data-theme="light"] .time-btn{color:#5b6b82}
+html[data-mode="dark"] .time-btn{color:#aab6c8}
+html[data-mode="light"] .time-btn{color:#5b6b82}
 /* 用原生热区覆盖整个输入框，使"点时间文字也能弹出选择器" */
 .time-input::-webkit-calendar-picker-indicator{
   position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;
@@ -355,6 +376,7 @@ html[data-theme="light"] .time-btn{color:#5b6b82}
 .switch{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
 .switch:last-child{border-bottom:0}
 .switch span{font-size:13.5px}
+.hint-muted{font-size:11.5px;color:var(--muted);margin-top:8px;opacity:.85}
 .tgl{width:46px;height:26px;border-radius:999px;background:var(--track);border:1px solid var(--line);
   position:relative;cursor:pointer;flex:0 0 46px;transition:.2s}
 .tgl::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;
@@ -370,7 +392,7 @@ html[data-theme="light"] .time-btn{color:#5b6b82}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 /* 数字输入框的上下箭头在深色下也保持可见 */
 .input::-webkit-inner-spin-button{opacity:.55}
-html[data-theme="light"] .input::-webkit-inner-spin-button{opacity:.4}
+html[data-mode="light"] .input::-webkit-inner-spin-button{opacity:.4}
 </style>
 </head>
 <body>
@@ -383,6 +405,9 @@ html[data-theme="light"] .input::-webkit-inner-spin-button{opacity:.4}
     <div class="topbar-right">
       <div class="badge rest" id="statusBadge"><i></i><span id="statusLabel">加载中</span></div>
       <div class="clock" id="clock">--:--:--</div>
+      <button class="icon-btn mode-toggle" id="btnMode" title="切换暗夜 / 浅色">
+        <span class="mode-ico" id="modeIcon">🌙</span><span class="mode-txt" id="modeText">暗夜</span>
+      </button>
       <button class="icon-btn" id="btnSettings" title="设置（快捷键 S）">⚙</button>
     </div>
   </header>
@@ -506,10 +531,12 @@ html[data-theme="light"] .input::-webkit-inner-spin-button{opacity:.4}
 
     <div class="field">
       <label>外观与提醒</label>
-      <div class="kv" style="padding:0 0 9px"><span>主题</span></div>
-      <div class="chips" id="themeChips">
-        <button data-theme="dark">暗夜绿</button><button data-theme="light">浅色</button><button data-theme="red">人民币红</button>
+      <div class="kv" style="padding:0 0 9px"><span>配色主题</span></div>
+      <div class="chips" id="paletteChips">
+        <button data-palette="green">青绿</button>
+        <button data-palette="red">红橙</button>
       </div>
+      <div class="hint-muted">暗夜 / 浅色在主页右上角切换</div>
       <div style="height:9px"></div>
       <div class="switch"><span>上下班提示音</span><div class="tgl" id="tglSound"></div></div>
       <div class="switch"><span>换算显示</span><div class="tgl" id="tglConv"></div></div>
@@ -945,7 +972,8 @@ var DEFAULT_SETTINGS={
   holidayMode: 'cn',
   payBasis: 'actual',
   decimals: 4,
-  theme: 'dark',
+  mode: 'dark',        // 明暗模式：dark | light
+  palette: 'green',    // 配色主题：green | red
   sound: false,
   showConv: true,
   conversions: CONV_PRESETS.map(function(p){
@@ -983,6 +1011,12 @@ function loadSettings(){
       // 关键：老数据没有 breaks 字段时，要补空数组而不是沿用默认午休，
       // 否则升级后计薪时长被悄悄改变（9h → 8h），时薪凭空变高。
       if(o.breaks===undefined) s.breaks=[];
+      // 旧版单一 theme 字段迁移到 mode + palette 两个维度
+      if(o.theme!==undefined && o.mode===undefined){
+        if(o.theme==='light') s.mode='light';
+        else s.mode='dark';
+        s.palette = (o.theme==='red') ? 'red' : 'green';
+      }
     }
   }catch(e){}
   if(!hadData) s.breaks=clone(DEFAULT_SETTINGS.breaks);
@@ -1034,10 +1068,16 @@ function normalize(s){
 function saveSettings(){
   try{ localStorage.setItem(KEY, JSON.stringify(settings)); }catch(e){}
 }
+/* 应用明暗模式与配色主题（两个独立维度） */
+function applyAppearance(){
+  var de=document.documentElement;
+  de.setAttribute('data-mode', settings.mode==='light' ? 'light' : 'dark');
+  de.setAttribute('data-palette', settings.palette==='red' ? 'red' : 'green');
+}
 function applySettings(rebuild, skipInputs){
   normalize(settings);
   cache = {};
-  document.documentElement.setAttribute('data-theme', settings.theme);
+  applyAppearance();
   if(rebuild) syncUI(!!skipInputs);
   saveSettings();
 }
@@ -1057,9 +1097,13 @@ function syncUI(keepInputs){
   $('inBasis').value = settings.payBasis;
   $('tglSound').classList.toggle('on', !!settings.sound);
   $('tglConv').classList.toggle('on', !!settings.showConv);
-  Array.prototype.forEach.call(document.querySelectorAll('#themeChips button'), function(b){
-    b.classList.toggle('on', b.dataset.theme===settings.theme);
+  Array.prototype.forEach.call(document.querySelectorAll('#paletteChips button'), function(b){
+    b.classList.toggle('on', b.dataset.palette===settings.palette);
   });
+  // 右上角明暗按钮
+  var isLight = settings.mode==='light';
+  $('modeIcon').textContent = isLight ? '☀' : '🌙';
+  $('modeText').textContent = isLight ? '浅色' : '暗夜';
 
   Array.prototype.forEach.call(document.querySelectorAll('#weekRow button'), function(b){
     b.classList.toggle('on', settings.workdays.indexOf(Number(b.dataset.dow))>=0);
@@ -1625,11 +1669,17 @@ Array.prototype.forEach.call(document.querySelectorAll('.mchip'), function(b){
   b.addEventListener('click', function(){ heroTab=b.dataset.tab; settings.heroTab=heroTab; applySettings(true); });
 });
 
-Array.prototype.forEach.call(document.querySelectorAll('#themeChips button'), function(b){
+Array.prototype.forEach.call(document.querySelectorAll('#paletteChips button'), function(b){
   b.addEventListener('click', function(){
-    settings.theme = b.dataset.theme;
+    settings.palette = b.dataset.palette;
     applySettings(true);
   });
+});
+
+// 右上角：暗夜 / 浅色一键切换
+$('btnMode').addEventListener('click', function(){
+  settings.mode = (settings.mode==='light') ? 'dark' : 'light';
+  applySettings(true);
 });
 
 $('tglSound').addEventListener('click', function(){
@@ -1653,7 +1703,7 @@ document.addEventListener('keydown', function(e){
 });
 
 /* ---------------- boot ---------------- */
-document.documentElement.setAttribute('data-theme', settings.theme);
+applyAppearance();
 syncUI();
 saveSettings();
 requestAnimationFrame(render);

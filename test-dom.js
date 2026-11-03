@@ -56,11 +56,11 @@ const decBtns  = [0,2,3,4].map(d => { const b = mkEl('button'); b.dataset.dec = 
 const tabBtns  = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
 const mchips   = ['today','month','year'].map(t => { const b = mkEl('button'); b.dataset.tab = t; return b; });
 
-const themeBtns = ['dark','light','red'].map(t => { const b = mkEl('button'); b.dataset.theme = t; return b; });
+const paletteBtns = ['green','red'].map(t => { const b = mkEl('button'); b.dataset.palette = t; return b; });
 const qmap = {
   '#weekRow button': weekBtns,
   '#decChips button': decBtns,
-  '#themeChips button': themeBtns,
+  '#paletteChips button': paletteBtns,
   '#tabs button': tabBtns,
   '.mchip': mchips,
 };
