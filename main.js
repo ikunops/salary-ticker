@@ -1,7 +1,7 @@
 const { app, BrowserWindow, Menu, shell, dialog } = require('electron');
 const path = require('path');
 
-// 单实例：重复打开时聚焦已有窗口
+// Single instance: focus the existing window when launched again
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   app.quit();
@@ -14,12 +14,11 @@ if (!gotLock) {
       height: 820,
       minWidth: 380,
       minHeight: 520,
-      title: '工资秒表',
+      title: 'SalaryTicker',
       backgroundColor: '#070a10',
       autoHideMenuBar: false,
       titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
       webPreferences: {
-        // 页面是纯本地静态文件，不需要 Node 集成
         nodeIntegration: false,
         contextIsolation: true,
         sandbox: true,
@@ -29,47 +28,47 @@ if (!gotLock) {
 
     const template = [
       {
-        label: '视图',
+        label: 'View',
         submenu: [
-          { role: 'reload', label: '重新加载' },
-          { role: 'toggleDevTools', label: '开发者工具' },
+          { role: 'reload', label: 'Reload' },
+          { role: 'toggleDevTools', label: 'DevTools' },
           { type: 'separator' },
-          { role: 'resetZoom', label: '实际大小' },
-          { role: 'zoomIn', label: '放大' },
-          { role: 'zoomOut', label: '缩小' },
+          { role: 'resetZoom', label: 'Actual Size' },
+          { role: 'zoomIn', label: 'Zoom In' },
+          { role: 'zoomOut', label: 'Zoom Out' },
           { type: 'separator' },
-          { role: 'togglefullscreen', label: '全屏' }
+          { role: 'togglefullscreen', label: 'Fullscreen' }
         ]
       },
       {
-        label: '帮助',
+        label: 'Help',
         submenu: [
           {
-            label: '快捷键说明',
+            label: 'Shortcuts',
             click: () => {
               dialog.showMessageBox(win, {
                 type: 'info',
-                title: '快捷键',
-                message: 'S  打开/关闭设置\nEsc  关闭设置',
-                buttons: ['好']
+                title: 'Shortcuts',
+                message: 'S  Open/close settings\nEsc  Close settings',
+                buttons: ['OK']
               });
             }
           }
         ]
       }
     ];
-    // macOS 首项应是应用菜单
+
     if (process.platform === 'darwin') {
       template.unshift({
         label: app.name,
         submenu: [
-          { role: 'about', label: '关于工资秒表' },
+          { role: 'about', label: 'About' },
           { type: 'separator' },
-          { role: 'hide', label: '隐藏' },
-          { role: 'hideOthers', label: '隐藏其他' },
-          { role: 'unhide', label: '显示全部' },
+          { role: 'hide', label: 'Hide' },
+          { role: 'hideOthers', label: 'Hide Others' },
+          { role: 'unhide', label: 'Show All' },
           { type: 'separator' },
-          { role: 'quit', label: '退出' }
+          { role: 'quit', label: 'Quit' }
         ]
       });
     }
@@ -77,7 +76,7 @@ if (!gotLock) {
 
     win.loadFile(path.join(__dirname, 'index.html'));
 
-    // 外部链接用系统浏览器打开
+    // Open external links in the system browser
     win.webContents.setWindowOpenHandler(({ url }) => {
       if (/^https?:\/\//i.test(url)) shell.openExternal(url);
       return { action: 'deny' };
@@ -93,12 +92,11 @@ if (!gotLock) {
     }
   });
 
-  // 全局兜底：任何未捕获异常都弹窗提示，而不是静默闪退
+  // Catch uncaught errors so the app does not silently crash
   process.on('uncaughtException', (err) => {
     try {
-      dialog.showErrorBox('工资秒表 - 运行出错',
-        '程序遇到问题：\n\n' + (err && err.message ? err.message : String(err)) +
-        '\n\n可以尝试右键“以管理员身份运行”，或直接双击同目录的 index.html 用浏览器打开。');
+      dialog.showErrorBox('SalaryTicker - Error',
+        'An error occurred:\n\n' + (err && err.message ? err.message : String(err)));
     } catch (_) {}
   });
 
@@ -106,9 +104,8 @@ if (!gotLock) {
     try {
       createWindow();
     } catch (e) {
-      dialog.showErrorBox('工资秒表 - 启动失败',
-        '无法创建窗口：\n\n' + (e && e.message ? e.message : String(e)) +
-        '\n\n可以尝试右键“以管理员身份运行”，或直接双击 index.html 用浏览器打开。');
+      dialog.showErrorBox('SalaryTicker - Failed to start',
+        'Could not create window:\n\n' + (e && e.message ? e.message : String(e)));
       app.quit();
       return;
     }
@@ -117,7 +114,7 @@ if (!gotLock) {
     });
   });
 
-  // macOS 习惯：关窗不退出应用
+  // macOS: keep app running when all windows are closed
   app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
   });

@@ -44,15 +44,21 @@
       "target": [
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ],
       "icon": "build/icon.png",
@@ -70,20 +76,26 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "工资秒表",
-      "artifactName": "SalaryTicker-${version}-win-x64-electron-setup.${ext}"
+      "artifactName": "SalaryTicker-${version}-win-x64-electron-setup.${ext}",
+      "differentialPackage": false
     },
     "mac": {
       "target": [
         {
           "target": "dmg",
-          "arch": ["x64", "arm64"]
+          "arch": [
+            "x64",
+            "arm64"
+          ]
         }
       ],
       "icon": "build/icon.png",
       "category": "public.app-category.finance",
       "identity": null,
       "artifactName": "SalaryTicker-${version}-mac-${arch}-electron.${ext}"
-    }
+    },
+    "publish": [],
+    "afterPack": "./build-hooks.js"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.0.0",
